@@ -1,167 +1,89 @@
 package com.xiezhen.musicplayer.activity;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.TransitionDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.xiezhen.musicplayer.R;
+import com.xiezhen.musicplayer.fragment.MyMusicListFragment;
+import com.xiezhen.musicplayer.fragment.NetMusicListFragment;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends BaseActivity {
 
-    private final Handler handler = new Handler();
 
     private PagerSlidingTabStrip tabs;
     private ViewPager pager;
-//    private MyPagerAdapter adapter;
+    private MyPagerAdapter adapter;
 
-    private Drawable oldBackground = null;
-    private int currentColor = 0xFF666666;
+    private DisplayMetrics dm;
+
+    private MyMusicListFragment myMusicListFragment;
+    private NetMusicListFragment netMusicListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       /* tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        dm = getResources().getDisplayMetrics();
+
+        tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         pager = (ViewPager) findViewById(R.id.pager);
+
         adapter = new MyPagerAdapter(getSupportFragmentManager());
-
         pager.setAdapter(adapter);
-
-        final int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources()
-                .getDisplayMetrics());
-        pager.setPageMargin(pageMargin);
-
         tabs.setViewPager(pager);
-
-        changeColor(currentColor);*/
+        setTabsValue();
+        bindPlayService();
     }
 
-  /*  @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-
-            case R.id.action_contact:
-                QuickContactFragment dialog = new QuickContactFragment();
-                dialog.show(getSupportFragmentManager(), "QuickContactFragment");
-                return true;
-
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void changeColor(int newColor) {
-
-        tabs.setIndicatorColor(newColor);
-
-        // change ActionBar color just if an ActionBar is available
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-
-            Drawable colorDrawable = new ColorDrawable(newColor);
-            Drawable bottomDrawable = getResources().getDrawable(R.drawable.actionbar_bottom);
-            LayerDrawable ld = new LayerDrawable(new Drawable[]{colorDrawable, bottomDrawable});
-
-            if (oldBackground == null) {
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    ld.setCallback(drawableCallback);
-                } else {
-                    getActionBar().setBackgroundDrawable(ld);
-                }
-
-            } else {
-
-                TransitionDrawable td = new TransitionDrawable(new Drawable[]{oldBackground, ld});
-
-                // workaround for broken ActionBarContainer drawable handling on
-                // pre-API 17 builds
-                // https://github.com/android/platform_frameworks_base/commit/a7cc06d82e45918c37429a59b14545c6a57db4e4
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    td.setCallback(drawableCallback);
-                } else {
-                    getActionBar().setBackgroundDrawable(td);
-                }
-
-                td.startTransition(200);
-
-            }
-
-            oldBackground = ld;
-
-            // http://stackoverflow.com/questions/11002691/actionbar-setbackgrounddrawable-nulling-background-from-thread-handler
-            getActionBar().setDisplayShowTitleEnabled(false);
-            getActionBar().setDisplayShowTitleEnabled(true);
-
-        }
-
-        currentColor = newColor;
-
-    }
-
-    public void onColorClicked(View v) {
-
-        int color = Color.parseColor(v.getTag().toString());
-        changeColor(color);
-
+    private void setTabsValue() {
+        // 设置Tab是自动填充满屏幕的
+        tabs.setShouldExpand(true);
+        // 设置Tab的分割线是透明的
+        tabs.setDividerColor(Color.TRANSPARENT);
+        // 设置Tab底部线的高度
+        tabs.setUnderlineHeight((int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 1, dm));
+        // 设置Tab Indicator的高度
+        tabs.setIndicatorHeight((int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 4, dm));
+        // 设置Tab标题文字的大小
+        tabs.setTextSize((int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_SP, 16, dm));
+        // 设置Tab Indicator的颜色
+        tabs.setIndicatorColor(Color.parseColor("#45c01a"));
+        // 设置选中Tab文字的颜色 (这是我自定义的一个方法)
+//        tabs.setSelectedTextColor(Color.parseColor("#45c01a"));
+        // 取消点击Tab时的背景色
+        tabs.setTabBackground(0);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("currentColor", currentColor);
+    public void publish(int progress) {
+        //更新进度条
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        currentColor = savedInstanceState.getInt("currentColor");
-        changeColor(currentColor);
+    public void change(int position) {
+        //切换状态播放位置
+        if (pager.getCurrentItem() == 0) {
+            myMusicListFragment.changeUIStatusOnPlay(position);
+        } else if (pager.getCurrentItem() == 1) {
+
+        }
     }
-
-    private Drawable.Callback drawableCallback = new Drawable.Callback() {
-        @Override
-        public void invalidateDrawable(Drawable who) {
-            getActionBar().setBackgroundDrawable(who);
-        }
-
-        @Override
-        public void scheduleDrawable(Drawable who, Runnable what, long when) {
-            handler.postAtTime(what, when);
-        }
-
-        @Override
-        public void unscheduleDrawable(Drawable who, Runnable what) {
-            handler.removeCallbacks(what);
-        }
-    };
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {"Categories", "Home", "Top Paid", "Top Free", "Top Grossing", "Top New Paid",
-                "Top New Free", "Trending"};
+        private final String[] TITLES = {getString(R.string.tab_name1), getString(R.string.tab_name2)};
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -179,9 +101,21 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return SuperAwesomeCardFragment.newInstance(position);
+            if (position == 0) {
+                if (myMusicListFragment == null) {
+                    myMusicListFragment = MyMusicListFragment.newInstance();
+                }
+                return myMusicListFragment;
+            } else if (position == 1) {
+                if (netMusicListFragment == null) {
+                    netMusicListFragment = NetMusicListFragment.newInstance();
+                }
+                return netMusicListFragment;
+            }
+            return null;
+
         }
 
-    }*/
+    }
 
 }
