@@ -40,7 +40,6 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     private ImageView iv_play_pause;
     private ImageView iv_next;
 
-    private boolean isPause = false;
     private int position = 0;
 
     public static MyMusicListFragment newInstance() {
@@ -72,13 +71,25 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
         iv_play_pause.setOnClickListener(this);
         iv_next.setOnClickListener(this);
         loadData();
-        mainActivity.bindPlayService();
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+//        mainActivity.unbindPlayService();
+        mainActivity.bindPlayService();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mainActivity.unbindPlayService();
+    }
+
     /*
-    加载本地音乐列表
-    * */
+            加载本地音乐列表
+            * */
     private void loadData() {
         mp3Infos = MediaUtils.getMp3Infos(getActivity());
         adapter = new MyMusicListAdapter(getActivity(), mp3Infos);
@@ -94,7 +105,6 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onDestroyView() {
         super.onDestroy();
-        mainActivity.unbindPlayService();
     }
 
     //    回调播放状态下的ui设置
@@ -105,9 +115,15 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             Mp3Info mp3Inf = mp3Infos.get(position);
             tv_songName.setText(mp3Inf.getTitle());
             tv_singer.setText(mp3Inf.getArtist());
-            iv_play_pause.setImageResource(R.mipmap.player_btn_pause_normal);
-            Bitmap albumBitmap = MediaUtils.getArtwork(mainActivity, mp3Inf.getId(), mp3Inf.getAlbumId(), false, true);
+
+            Bitmap albumBitmap = MediaUtils.getArtwork(mainActivity, mp3Inf.getId(), mp3Inf.getAlbumId(), true, true);
             iv_head.setImageBitmap(albumBitmap);
+
+            if (mainActivity.playService.isPlaying()) {
+                iv_play_pause.setImageResource(R.mipmap.pause);
+            } else {
+                iv_play_pause.setImageResource(R.mipmap.play);
+            }
             this.position = position;
         }
     }
@@ -119,15 +135,13 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
                 if (mainActivity.playService.isPlaying()) {
                     iv_play_pause.setImageResource(R.mipmap.player_btn_play_normal);
                     mainActivity.playService.pause();
-                    isPause = true;
                 } else {
-                    if (isPause) {
+                    if (mainActivity.playService.isPause()) {
                         iv_play_pause.setImageResource(R.mipmap.player_btn_pause_normal);
                         mainActivity.playService.start();
                     } else {
                         mainActivity.playService.play(0);
                     }
-                    isPause = false;
 
                 }
                 break;
@@ -138,7 +152,6 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             }
             case R.id.imageView_head: {
                 Intent intent = new Intent(mainActivity, PlayActivity.class);
-                intent.putExtra("isPause", isPause);
                 startActivity(intent);
                 break;
             }

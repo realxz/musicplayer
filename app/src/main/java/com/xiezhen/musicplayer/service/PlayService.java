@@ -27,6 +27,11 @@ public class PlayService extends Service {
     private MusicUpdateListener musicUpdateListener;
 
     private ExecutorService es = Executors.newSingleThreadExecutor();
+    private boolean isPause = false;
+
+    public boolean isPause() {
+        return isPause;
+    }
 
     public PlayService() {
 
@@ -106,6 +111,7 @@ public class PlayService extends Service {
     public void pause() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
+            isPause = true;
         }
     }
 

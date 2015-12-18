@@ -29,7 +29,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     private ArrayList<Mp3Info> mp3infos;
     private static final int UPDATE_TIME = 0x1;
     private static MyHandler myHandler;
-    private boolean isPause = false;
+//    private boolean isPause = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +38,29 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         initView();
         addListener();
         mp3infos = MediaUtils.getMp3Infos(this);
-        bindPlayService();
+//        bindPlayService();
 //        change(position);
         myHandler = new MyHandler(this);
-        isPause = getIntent().getBooleanExtra("isPause", false);
+//        isPause = getIntent().getBooleanExtra("isPause", false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("xiezhen","PlayActivity OnResume");
+//        unbindPlayService();
+        bindPlayService();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindPlayService();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindPlayService();
     }
 
     public void initView() {
@@ -102,16 +115,19 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void change(int position) {
-        Log.d("xiezhen","PlayActivity");
-        if (this.playService.isPlaying()) {
-            Mp3Info mp3Info = mp3infos.get(position);
-            textView1_title.setText(mp3Info.getTitle());
-            Bitmap albumBitmap = MediaUtils.getArtwork(this, mp3Info.getId(), mp3Info.getAlbumId(), true, true);
-            imageView1_album.setImageBitmap(albumBitmap);
-            textView1_end_time.setText(MediaUtils.formatTime(mp3Info.getDuration()));
+        Log.d("xiezhen", "PlayActivity");
+        Mp3Info mp3Info = mp3infos.get(position);
+        textView1_title.setText(mp3Info.getTitle());
+        Bitmap albumBitmap = MediaUtils.getArtwork(this, mp3Info.getId(), mp3Info.getAlbumId(), true, false);
+        imageView1_album.setImageBitmap(albumBitmap);
+        textView1_end_time.setText(MediaUtils.formatTime(mp3Info.getDuration()));
+
+        seekBar1.setProgress(0);
+        seekBar1.setMax((int) mp3Info.getDuration());
+        if (playService.isPlaying()) {
             imageView2_play_pause.setImageResource(R.mipmap.pause);
-            seekBar1.setProgress(0);
-            seekBar1.setMax((int) mp3Info.getDuration());
+        } else {
+            imageView2_play_pause.setImageResource(R.mipmap.play);
         }
 
     }
@@ -123,15 +139,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
                 if (playService.isPlaying()) {
                     imageView2_play_pause.setImageResource(R.mipmap.play);
                     playService.pause();
-                    isPause=true;
                 } else {
-                    if (isPause) {
+                    if (playService.isPause()) {
                         imageView2_play_pause.setImageResource(R.mipmap.pause);
                         playService.start();
                     } else {
                         playService.play(0);
                     }
-                    isPause=false;
                 }
                 break;
             default:
