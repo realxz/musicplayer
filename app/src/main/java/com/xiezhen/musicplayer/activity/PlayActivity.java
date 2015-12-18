@@ -24,6 +24,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     private ImageView imageView1_play_mode;
     private SeekBar seekBar1;
     private ArrayList<Mp3Info> mp3infos;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         addListener();
         mp3infos = MediaUtils.getMp3Infos(this);
         bindPlayService();
+        position = getIntent().getIntExtra("position", 0);
+        change(position);
     }
 
     @Override
@@ -63,6 +66,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void publish(int progress) {
+//        textView1_start_time.setText(MediaUtils.formatTime(progress));
+        seekBar1.setProgress(progress);
     }
 
     @Override
@@ -74,6 +79,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
             imageView1_album.setImageBitmap(albumBitmap);
             textView1_end_time.setText(MediaUtils.formatTime(mp3Info.getDuration()));
             imageView2_play_pause.setImageResource(R.mipmap.player_btn_pause_normal);
+            seekBar1.setProgress(0);
+            seekBar1.setMax((int) mp3Info.getDuration());
         }
 
     }

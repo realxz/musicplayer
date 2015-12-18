@@ -40,6 +40,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     private ImageView iv_next;
 
     private boolean isPause = false;
+    private int position = 0;
 
     public static MyMusicListFragment newInstance() {
         MyMusicListFragment my = new MyMusicListFragment();
@@ -104,7 +105,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             iv_play_pause.setImageResource(R.mipmap.player_btn_pause_normal);
             Bitmap albumBitmap = MediaUtils.getArtwork(mainActivity, mp3Inf.getId(), mp3Inf.getAlbumId(), false, true);
             iv_head.setImageBitmap(albumBitmap);
-
+            this.position = position;
         }
     }
 
@@ -133,8 +134,8 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
                 break;
             }
             case R.id.imageView_head: {
-                mainActivity.bindPlayService();
                 Intent intent = new Intent(mainActivity, PlayActivity.class);
+                intent.putExtra("position", position);
                 startActivity(intent);
                 break;
             }

@@ -48,6 +48,9 @@ public class PlayService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (es != null && es.isShutdown() == false) {
+            es.shutdown();
+        }
         Log.d("xiezhen", "onDestroy");
     }
 
@@ -64,8 +67,13 @@ public class PlayService extends Service {
         @Override
         public void run() {
             while (true) {
-                if (musicUpdateListener != null) {
+                if (musicUpdateListener != null && mPlayer != null & mPlayer.isPlaying()) {
                     musicUpdateListener.onPublish(getCurrentProgress());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
