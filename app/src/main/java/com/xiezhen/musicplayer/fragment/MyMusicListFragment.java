@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,7 +99,9 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
 
     //    回调播放状态下的ui设置
     public void changeUIStatusOnPlay(int position) {
+        Log.d("xiezhen", "changeUistatusonplay");
         if (position >= 0 && position < mp3Infos.size()) {
+            Log.d("xiezhen", "" + position);
             Mp3Info mp3Inf = mp3Infos.get(position);
             tv_songName.setText(mp3Inf.getTitle());
             tv_singer.setText(mp3Inf.getArtist());
@@ -135,7 +138,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             }
             case R.id.imageView_head: {
                 Intent intent = new Intent(mainActivity, PlayActivity.class);
-                intent.putExtra("position", position);
+                intent.putExtra("isPause", isPause);
                 startActivity(intent);
                 break;
             }

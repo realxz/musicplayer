@@ -28,7 +28,8 @@ public abstract class BaseActivity extends FragmentActivity {
             PlayService.PlayBinder playBinder = (PlayService.PlayBinder) service;
             playService = playBinder.getPlayService();
             playService.setMusicUpdateListener(musicUpdateListener);
-            Log.d("xiezhen", "onServiceConnected");
+            musicUpdateListener.onChange(playService.getCurrentPosition());
+            Log.d("xiezhen", "onServiceConnected"+playService.getCurrentPosition());
         }
 
         @Override

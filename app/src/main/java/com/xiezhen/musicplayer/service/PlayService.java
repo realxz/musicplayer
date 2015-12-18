@@ -32,11 +32,16 @@ public class PlayService extends Service {
 
     }
 
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
     public class PlayBinder extends Binder {
         public PlayService getPlayService() {
             return PlayService.this;
         }
     }
+
 
     @Nullable
     @Override

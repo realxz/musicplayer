@@ -2,6 +2,9 @@ package com.xiezhen.musicplayer.activity;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -24,7 +27,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     private ImageView imageView1_play_mode;
     private SeekBar seekBar1;
     private ArrayList<Mp3Info> mp3infos;
-    private int position;
+    private static final int UPDATE_TIME = 0x1;
+    private static MyHandler myHandler;
+    private boolean isPause = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +39,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         addListener();
         mp3infos = MediaUtils.getMp3Infos(this);
         bindPlayService();
-        position = getIntent().getIntExtra("position", 0);
-        change(position);
+//        change(position);
+        myHandler = new MyHandler(this);
+        isPause = getIntent().getBooleanExtra("isPause", false);
     }
 
     @Override
@@ -64,21 +70,46 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+    static class MyHandler extends Handler {
+        private PlayActivity playActivity;
+
+
+        public MyHandler(PlayActivity playActivity) {
+            this.playActivity = playActivity;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (playActivity != null) {
+                switch (msg.what) {
+                    case UPDATE_TIME:
+                        playActivity.textView1_start_time.setText(MediaUtils.formatTime(msg.arg1));
+                }
+            }
+
+        }
+    }
+
     @Override
     public void publish(int progress) {
 //        textView1_start_time.setText(MediaUtils.formatTime(progress));
+        Message msg = myHandler.obtainMessage(UPDATE_TIME);
+        msg.arg1 = progress;
+        myHandler.sendMessage(msg);
         seekBar1.setProgress(progress);
     }
 
     @Override
     public void change(int position) {
+        Log.d("xiezhen","PlayActivity");
         if (this.playService.isPlaying()) {
             Mp3Info mp3Info = mp3infos.get(position);
             textView1_title.setText(mp3Info.getTitle());
             Bitmap albumBitmap = MediaUtils.getArtwork(this, mp3Info.getId(), mp3Info.getAlbumId(), true, true);
             imageView1_album.setImageBitmap(albumBitmap);
             textView1_end_time.setText(MediaUtils.formatTime(mp3Info.getDuration()));
-            imageView2_play_pause.setImageResource(R.mipmap.player_btn_pause_normal);
+            imageView2_play_pause.setImageResource(R.mipmap.pause);
             seekBar1.setProgress(0);
             seekBar1.setMax((int) mp3Info.getDuration());
         }
@@ -87,6 +118,24 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.imageView2_play_pause:
+                if (playService.isPlaying()) {
+                    imageView2_play_pause.setImageResource(R.mipmap.play);
+                    playService.pause();
+                    isPause=true;
+                } else {
+                    if (isPause) {
+                        imageView2_play_pause.setImageResource(R.mipmap.pause);
+                        playService.start();
+                    } else {
+                        playService.play(0);
+                    }
+                    isPause=false;
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
