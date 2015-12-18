@@ -6,6 +6,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.xiezhen.musicplayer.service.PlayService;
 
@@ -13,7 +14,7 @@ import com.xiezhen.musicplayer.service.PlayService;
  * Created by xiezhen on 2015/12/16 0016.
  */
 public abstract class BaseActivity extends FragmentActivity {
-    public  PlayService playService;
+    public PlayService playService;
     private boolean isBind = false;
 
     @Override
@@ -27,11 +28,13 @@ public abstract class BaseActivity extends FragmentActivity {
             PlayService.PlayBinder playBinder = (PlayService.PlayBinder) service;
             playService = playBinder.getPlayService();
             playService.setMusicUpdateListener(musicUpdateListener);
+            Log.d("xiezhen", "onServiceConnected");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            playService=null;
+            playService = null;
+            isBind = false;
         }
     };
     private PlayService.MusicUpdateListener musicUpdateListener = new PlayService.MusicUpdateListener() {

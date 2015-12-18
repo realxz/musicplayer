@@ -1,6 +1,7 @@
 package com.xiezhen.musicplayer.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.activity.MainActivity;
+import com.xiezhen.musicplayer.activity.PlayActivity;
 import com.xiezhen.musicplayer.adapter.MyMusicListAdapter;
 import com.xiezhen.musicplayer.entity.Mp3Info;
 import com.xiezhen.musicplayer.utils.MediaUtils;
@@ -64,7 +66,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
         tv_singer = (TextView) view.findViewById(R.id.textView_singer);
 
         listView_my_music.setOnItemClickListener(this);
-
+        iv_head.setOnClickListener(this);
         iv_play_pause.setOnClickListener(this);
         iv_next.setOnClickListener(this);
         loadData();
@@ -128,6 +130,12 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             }
             case R.id.imageView_next: {
                 mainActivity.playService.next();
+                break;
+            }
+            case R.id.imageView_head: {
+                mainActivity.bindPlayService();
+                Intent intent = new Intent(mainActivity, PlayActivity.class);
+                startActivity(intent);
                 break;
             }
             default:

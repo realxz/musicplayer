@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.xiezhen.musicplayer.entity.Mp3Info;
 import com.xiezhen.musicplayer.utils.MediaUtils;
@@ -40,7 +41,14 @@ public class PlayService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d("xiezhen", "onBind");
         return new PlayBinder();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("xiezhen", "onDestroy");
     }
 
     @Override
@@ -49,6 +57,7 @@ public class PlayService extends Service {
         mPlayer = new MediaPlayer();
         mp3Infos = MediaUtils.getMp3Infos(this);
         es.execute(updateStatus);
+        Log.d("xiezhen", "onCreate");
     }
 
     Runnable updateStatus = new Runnable() {
