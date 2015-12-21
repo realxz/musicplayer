@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.entity.Mp3Info;
+import com.xiezhen.musicplayer.service.PlayService;
 import com.xiezhen.musicplayer.utils.MediaUtils;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("xiezhen","PlayActivity OnResume");
+        Log.d("xiezhen", "PlayActivity OnResume");
 //        unbindPlayService();
         bindPlayService();
     }
@@ -130,12 +131,29 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
             imageView2_play_pause.setImageResource(R.mipmap.play);
         }
 
+        switch (playService.getPlay_mode()) {
+            case PlayService.ORDER_PLAY:
+                imageView1_play_mode.setImageResource(R.mipmap.order);
+                imageView1_play_mode.setTag(PlayService.ORDER_PLAY);
+                break;
+            case PlayService.RANDOM_PLAY:
+                imageView1_play_mode.setImageResource(R.mipmap.random);
+                imageView1_play_mode.setTag(PlayService.RANDOM_PLAY);
+                break;
+            case PlayService.SINGLE_PLAY:
+                imageView1_play_mode.setImageResource(R.mipmap.single);
+                imageView1_play_mode.setTag(PlayService.SINGLE_PLAY);
+                break;
+            default:
+                break;
+        }
+
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.imageView2_play_pause:
+            case R.id.imageView2_play_pause: {
                 if (playService.isPlaying()) {
                     imageView2_play_pause.setImageResource(R.mipmap.play);
                     playService.pause();
@@ -148,6 +166,36 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
                     }
                 }
                 break;
+            }
+            case R.id.imageView1_next:
+                playService.next();
+                break;
+            case R.id.imageView3_previous:
+                playService.prev();
+                break;
+            case R.id.imageView1_play_mode: {
+                int mode = (int) imageView1_play_mode.getTag();
+                switch (mode) {
+                    case PlayService.ORDER_PLAY:
+                        imageView1_play_mode.setImageResource(R.mipmap.random);
+                        imageView1_play_mode.setTag(PlayService.RANDOM_PLAY);
+                        playService.setPlay_mode(PlayService.RANDOM_PLAY);
+                        break;
+                    case PlayService.RANDOM_PLAY:
+                        imageView1_play_mode.setImageResource(R.mipmap.single);
+                        imageView1_play_mode.setTag(PlayService.SINGLE_PLAY);
+                        playService.setPlay_mode(PlayService.SINGLE_PLAY);
+                        break;
+                    case PlayService.SINGLE_PLAY:
+                        imageView1_play_mode.setImageResource(R.mipmap.order);
+                        imageView1_play_mode.setTag(PlayService.ORDER_PLAY);
+                        playService.setPlay_mode(PlayService.ORDER_PLAY);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
             default:
                 break;
         }

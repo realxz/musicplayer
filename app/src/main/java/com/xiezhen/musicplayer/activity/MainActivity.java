@@ -44,8 +44,6 @@ public class MainActivity extends BaseActivity {
         tabs.setViewPager(pager);
         setTabsValue();
 //        bindPlayService();
-        Intent intent = new Intent(this, PlayService.class);
-        startService(intent);
     }
 
     private void setTabsValue() {

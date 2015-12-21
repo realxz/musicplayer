@@ -14,13 +14,14 @@ import com.xiezhen.musicplayer.utils.MediaUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * Created by xiezhen on 2015/12/16 0016.
  */
-public class PlayService extends Service {
+public class PlayService extends Service implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
     private MediaPlayer mPlayer;
     private int currentPosition = 0;//当前正在播放的歌曲位置
     ArrayList<Mp3Info> mp3Infos;
@@ -28,6 +29,26 @@ public class PlayService extends Service {
 
     private ExecutorService es = Executors.newSingleThreadExecutor();
     private boolean isPause = false;
+    //播放模式
+    public static final int ORDER_PLAY = 1;
+    public static final int RANDOM_PLAY = 2;
+    public static final int SINGLE_PLAY = 3;
+    private int play_mode = ORDER_PLAY;
+
+    private Random random = new Random();
+
+    /**
+     * @param play_mode ORDER_PLAY
+     *                  RANDOM_PLAY
+     *                  SINGLE_PLAY
+     */
+    public void setPlay_mode(int play_mode) {
+        this.play_mode = play_mode;
+    }
+
+    public int getPlay_mode() {
+        return play_mode;
+    }
 
     public boolean isPause() {
         return isPause;
@@ -39,6 +60,29 @@ public class PlayService extends Service {
 
     public int getCurrentPosition() {
         return currentPosition;
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        switch (play_mode) {
+            case ORDER_PLAY:
+                next();
+                break;
+            case RANDOM_PLAY:
+                play(random.nextInt(mp3Infos.size()));
+                break;
+            case SINGLE_PLAY:
+                play(currentPosition);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        mp.reset();
+        return false;
     }
 
     public class PlayBinder extends Binder {
@@ -68,6 +112,8 @@ public class PlayService extends Service {
     public void onCreate() {
         super.onCreate();
         mPlayer = new MediaPlayer();
+        mPlayer.setOnCompletionListener(this);
+        mPlayer.setOnErrorListener(this);
         mp3Infos = MediaUtils.getMp3Infos(this);
         es.execute(updateStatus);
         Log.d("xiezhen", "onCreate");
