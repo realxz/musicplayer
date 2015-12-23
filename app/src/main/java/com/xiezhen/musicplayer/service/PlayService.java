@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.entity.Mp3Info;
 import com.xiezhen.musicplayer.utils.MediaUtils;
 
@@ -111,12 +112,14 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     @Override
     public void onCreate() {
         super.onCreate();
+        currentPosition = CrashAppliacation.sp.getInt("currentPosition", 0);
+        play_mode = CrashAppliacation.sp.getInt("play_mode", PlayService.ORDER_PLAY);
+
         mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(this);
         mPlayer.setOnErrorListener(this);
         mp3Infos = MediaUtils.getMp3Infos(this);
         es.execute(updateStatus);
-        Log.d("xiezhen", "onCreate");
     }
 
     Runnable updateStatus = new Runnable() {

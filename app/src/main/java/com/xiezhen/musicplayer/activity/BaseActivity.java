@@ -3,12 +3,14 @@ package com.xiezhen.musicplayer.activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.xiezhen.musicplayer.service.PlayService;
+import com.xiezhen.musicplayer.utils.Contant;
 
 /**
  * Created by xiezhen on 2015/12/16 0016.
@@ -20,6 +22,7 @@ public abstract class BaseActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
     }
 
     private ServiceConnection conn = new ServiceConnection() {
@@ -29,7 +32,7 @@ public abstract class BaseActivity extends FragmentActivity {
             playService = playBinder.getPlayService();
             playService.setMusicUpdateListener(musicUpdateListener);
             musicUpdateListener.onChange(playService.getCurrentPosition());
-            Log.d("xiezhen", "onServiceConnected"+playService.getCurrentPosition());
+            Log.d("xiezhen", "onServiceConnected" + playService.getCurrentPosition());
         }
 
         @Override

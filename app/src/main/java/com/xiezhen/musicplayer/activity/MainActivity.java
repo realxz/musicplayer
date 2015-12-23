@@ -1,10 +1,9 @@
 package com.xiezhen.musicplayer.activity;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -13,9 +12,9 @@ import android.util.TypedValue;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.xiezhen.musicplayer.R;
+import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.fragment.MyMusicListFragment;
 import com.xiezhen.musicplayer.fragment.NetMusicListFragment;
-import com.xiezhen.musicplayer.service.PlayService;
 
 public class MainActivity extends BaseActivity {
 
@@ -120,4 +119,12 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences.Editor editor = CrashAppliacation.sp.edit();
+        editor.putInt("currentPosition", playService.getCurrentPosition());
+        editor.putInt("play_mode", playService.getPlay_mode());
+        editor.commit();
+    }
 }

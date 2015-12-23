@@ -9,6 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.xiezhen.musicplayer.R;
+import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.service.PlayService;
 
 public class StartActivity extends Activity {
@@ -22,7 +23,8 @@ public class StartActivity extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_start);
-        startService(new Intent(this, PlayService.class));
+        Intent intent = new Intent(this, PlayService.class);
+        startService(intent);
         handler.sendEmptyMessageDelayed(START_ACTIVITY, 2000);
     }
 

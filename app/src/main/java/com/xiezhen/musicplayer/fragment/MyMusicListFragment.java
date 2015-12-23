@@ -140,7 +140,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
                         iv_play_pause.setImageResource(R.mipmap.player_btn_pause_normal);
                         mainActivity.playService.start();
                     } else {
-                        mainActivity.playService.play(0);
+                        mainActivity.playService.play(mainActivity.playService.getCurrentPosition());
                     }
 
                 }

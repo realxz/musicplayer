@@ -2,85 +2,103 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#5c5b5b">
 
-    <ImageView
-        android:id="@+id/imageView1_next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:src="@mipmap/player_btn_next_normal" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearLayout3" />
 
-    <ImageView
-        android:id="@+id/imageView2_play_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/imageView1_next"
-        android:layout_toLeftOf="@id/imageView1_next"
-        android:src="@mipmap/player_btn_play_normal" />
-
-    <ImageView
-        android:id="@+id/imageView3_previous"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/imageView2_play_pause"
-        android:layout_toLeftOf="@id/imageView2_play_pause"
-        android:src="@mipmap/player_btn_pre_normal" />
-
-    <ImageView
-        android:id="@+id/imageView1_play_mode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:src="@mipmap/order" />
-
-    <TextView
-        android:id="@+id/textView1_start_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/imageView1_play_mode"
-        android:layout_alignLeft="@id/imageView1_play_mode"
-        android:layout_marginBottom="10dp"
-        android:text="00:00"
-        android:textColor="@android:color/darker_gray" />
-
-    <TextView
-        android:id="@+id/textView1_end_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/textView1_start_time"
-        android:layout_alignRight="@id/imageView1_next"
-        android:text="00:00"
-        android:textColor="@android:color/darker_gray" />
-
-    <SeekBar
-        android:id="@+id/seekBar1"
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/textView1_start_time"
-        android:layout_alignParentLeft="true"
-        android:indeterminate="false" />
+        android:layout_alignParentBottom="true"
+        android:background="#2d2c2c"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/imageView1_album"
-        android:layout_width="192dp"
-        android:layout_height="192dp"
-        android:layout_centerInParent="true"
-        android:scaleType="fitCenter"
-        android:src="@mipmap/app_logo2" />
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/textView1_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/seekBar1"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="歌 名"
-        android:textColorHighlight="@android:color/holo_blue_light"/>
+            <TextView
+                android:id="@+id/textView1_start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@android:color/darker_gray" />
+
+            <SeekBar
+                android:id="@+id/seekBar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textView1_end_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView1_play_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/order" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ImageView1_favorite"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="100dp"
+                    android:src="@mipmap/xin_bai" />
+
+                <ImageView
+                    android:id="@+id/imageView3_previous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/player_btn_pre_normal" />
+
+                <ImageView
+                    android:id="@+id/imageView2_play_pause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/player_btn_play_normal" />
+
+                <ImageView
+                    android:id="@+id/imageView1_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:src="@mipmap/player_btn_next_normal" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
 </RelativeLayout>

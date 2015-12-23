@@ -2,4 +2,7 @@
     <string name="app_name">MusicPlayer</string>
     <string name="tab_name1">我的音乐</string>
     <string name="tab_name2">网络音乐</string>
+    <string name="random_play">随机播放</string>
+    <string name="order_play">顺序播放</string>
+    <string name="single_play">单曲循环</string>
 </resources>
