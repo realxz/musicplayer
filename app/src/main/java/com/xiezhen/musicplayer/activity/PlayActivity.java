@@ -215,7 +215,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
             if (null == likeMp3Info) {
                 imageView1_favorite.setImageResource(R.mipmap.xin_bai);
             } else {
-                imageView1_favorite.setImageResource(R.mipmap.xin_hong);
+                int isLike = likeMp3Info.getIsLike();
+                if (isLike == 1) {
+                    imageView1_favorite.setImageResource(R.mipmap.xin_hong);
+                } else {
+                    imageView1_favorite.setImageResource(R.mipmap.xin_bai);
+                }
             }
         } catch (DbException e) {
             e.printStackTrace();
@@ -229,9 +234,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
             case PlayService.MY_MUSIC_LIST:
                 id = mp3Info.getId();
                 break;
+            case PlayService.PLAY_RECORD_LIST:
+                id = mp3Info.getMp3InfoId();
+                break;
             case PlayService.LIKE_MUSIC_LIST:
                 id = mp3Info.getMp3InfoId();
                 break;
+
+
             default:
                 break;
         }
@@ -300,15 +310,15 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
                         CrashAppliacation.dbUtils.save(mp3Info);
                         imageView1_favorite.setImageResource(R.mipmap.xin_hong);
                     } else {
-                        int isLikt = likeMp3Info.getIsLike();
-                        if (isLikt == 1) {
+                        int isLike = likeMp3Info.getIsLike();
+                        if (isLike == 1) {
                             likeMp3Info.setIsLike(0);
                             imageView1_favorite.setImageResource(R.mipmap.xin_bai);
                         } else {
                             likeMp3Info.setIsLike(1);
                             imageView1_favorite.setImageResource(R.mipmap.xin_hong);
                         }
-                        CrashAppliacation.dbUtils.deleteById(Mp3Info.class, likeMp3Info.getId());
+                        CrashAppliacation.dbUtils.update(likeMp3Info, "isLike");
 
                     }
                 } catch (DbException e) {

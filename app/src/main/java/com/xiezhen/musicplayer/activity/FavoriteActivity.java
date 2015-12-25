@@ -77,5 +77,21 @@ public class FavoriteActivity extends BaseActivity implements AdapterView.OnItem
 
         }
         playService.play(position);
+        savePlayRecord();
+    }
+    private  void savePlayRecord(){
+        Mp3Info mp3Info=playService.getMp3Infos().get(playService.getCurrentPosition());
+        try {
+            Mp3Info playRecordMp3Info=CrashAppliacation.dbUtils.findFirst(Selector.from(Mp3Info.class).where("mp3InfoId","=",mp3Info.getMp3InfoId()));
+            if(playRecordMp3Info==null){
+                mp3Info.setPlayTime(System.currentTimeMillis());
+                CrashAppliacation.dbUtils.save(mp3Info);
+            }else{
+                playRecordMp3Info.setPlayTime(System.currentTimeMillis());
+                CrashAppliacation.dbUtils.update(playRecordMp3Info,"playTime");
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 }

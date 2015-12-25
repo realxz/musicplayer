@@ -59,6 +59,8 @@
         <activity android:name=".activity.PlayActivity" />
         <activity android:name=".activity.FavoriteActivity" >
         </activity>
+        <activity android:name=".activity.PlayRecordListActivity" >
+        </activity>
     </application>
 
 </manifest>

@@ -62,6 +62,8 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
                 break;
             case R.id.near_play:
+                Intent intent1 = new Intent(this, PlayRecordListActivity.class);
+                startActivity(intent1);
                 break;
         }
         return true;

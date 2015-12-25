@@ -31,8 +31,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     private ExecutorService es = Executors.newSingleThreadExecutor();
     private boolean isPause = false;
 
-    public static final int MY_MUSIC_LIST = 1;
-    public static final int LIKE_MUSIC_LIST = 2;
+    public static final int MY_MUSIC_LIST = 1;//我的音乐
+    public static final int LIKE_MUSIC_LIST = 2;//我收藏的音乐
+    public static final int PLAY_RECORD_LIST = 3;//最近播放的音乐
     public int changePlayList = MY_MUSIC_LIST;
 
     public int getChangePlayList() {
@@ -74,6 +75,10 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     public void setMp3Infos(ArrayList<Mp3Info> mp3Infos) {
         this.mp3Infos = mp3Infos;
+    }
+
+    public ArrayList<Mp3Info> getMp3Infos() {
+        return mp3Infos;
     }
 
     public int getCurrentPosition() {

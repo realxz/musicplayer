@@ -15,10 +15,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.exception.DbException;
 import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.activity.MainActivity;
 import com.xiezhen.musicplayer.activity.PlayActivity;
 import com.xiezhen.musicplayer.adapter.MyMusicListAdapter;
+import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.entity.Mp3Info;
 import com.xiezhen.musicplayer.service.PlayService;
 import com.xiezhen.musicplayer.utils.MediaUtils;
@@ -106,6 +109,26 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             mainActivity.playService.setChangePlayList(PlayService.MY_MUSIC_LIST);
         }
         mainActivity.playService.play(position);
+
+        //保存播放时间
+        savePlayRecord();
+    }
+
+    private void savePlayRecord() {
+        Mp3Info mp3Info = mainActivity.playService.getMp3Infos().get(mainActivity.playService.getCurrentPosition());
+        try {
+            Mp3Info playRecordMp3Info = CrashAppliacation.dbUtils.findFirst(Selector.from(Mp3Info.class).where("mp3InfoId", "=", mp3Info.getId()));
+            if (playRecordMp3Info == null) {
+                mp3Info.setMp3InfoId(mp3Info.getId());
+                mp3Info.setPlayTime(System.currentTimeMillis());
+                CrashAppliacation.dbUtils.save(mp3Info);
+            } else {
+                playRecordMp3Info.setPlayTime(System.currentTimeMillis());
+                CrashAppliacation.dbUtils.update(playRecordMp3Info, "playTime");
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.xiezhen.musicplayer.activity.FavoriteActivity">
+
+    <TextView
+        android:id="@+id/record_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="最近播放的5首音乐"
+        android:textSize="20sp" />
+
+    <ListView
+        android:id="@+id/record_lv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/record_tv"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
