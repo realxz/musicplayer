@@ -1,5 +1,6 @@
 package com.xiezhen.musicplayer.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.xiezhen.musicplayer.R;
@@ -45,6 +48,25 @@ public class MainActivity extends BaseActivity {
 //        bindPlayService();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.ilike:
+                Intent intent = new Intent(this, FavoriteActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.near_play:
+                break;
+        }
+        return true;
+    }
+
     private void setTabsValue() {
         // 设置Tab是自动填充满屏幕的
         tabs.setShouldExpand(true);
@@ -76,7 +98,9 @@ public class MainActivity extends BaseActivity {
     public void change(int position) {
         //切换状态播放位置
         if (pager.getCurrentItem() == 0) {
+            myMusicListFragment.loadData();
             myMusicListFragment.changeUIStatusOnPlay(position);
+
         } else if (pager.getCurrentItem() == 1) {
 
         }

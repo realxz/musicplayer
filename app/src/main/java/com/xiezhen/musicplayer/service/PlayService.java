@@ -25,11 +25,24 @@ import java.util.concurrent.Executors;
 public class PlayService extends Service implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
     private MediaPlayer mPlayer;
     private int currentPosition = 0;//当前正在播放的歌曲位置
-    ArrayList<Mp3Info> mp3Infos;
+    public ArrayList<Mp3Info> mp3Infos;
     private MusicUpdateListener musicUpdateListener;
 
     private ExecutorService es = Executors.newSingleThreadExecutor();
     private boolean isPause = false;
+
+    public static final int MY_MUSIC_LIST = 1;
+    public static final int LIKE_MUSIC_LIST = 2;
+    public int changePlayList = MY_MUSIC_LIST;
+
+    public int getChangePlayList() {
+        return changePlayList;
+    }
+
+    public void setChangePlayList(int changePlayList) {
+        this.changePlayList = changePlayList;
+    }
+
     //播放模式
     public static final int ORDER_PLAY = 1;
     public static final int RANDOM_PLAY = 2;
@@ -57,6 +70,10 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     public PlayService() {
 
+    }
+
+    public void setMp3Infos(ArrayList<Mp3Info> mp3Infos) {
+        this.mp3Infos = mp3Infos;
     }
 
     public int getCurrentPosition() {
@@ -139,22 +156,24 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     };
 
     public void play(int position) {
-        if (position >= 0 && position < mp3Infos.size()) {
-            Mp3Info mp3Info = mp3Infos.get(position);
-            mPlayer.reset();
-            try {
-                mPlayer.setDataSource(this, Uri.parse(mp3Info.getUrl()));
-                mPlayer.prepare();
-                mPlayer.start();
-                currentPosition = position;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (musicUpdateListener != null) {
-                musicUpdateListener.onChange(currentPosition);
-            }
-
+        Mp3Info mp3Info = null;
+        if (position < 0 || position >= mp3Infos.size()) {
+            position = 0;
         }
+        mp3Info = mp3Infos.get(position);
+        try {
+            mPlayer.reset();
+            mPlayer.setDataSource(this, Uri.parse(mp3Info.getUrl()));
+            mPlayer.prepare();
+            mPlayer.start();
+            currentPosition = position;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (musicUpdateListener != null) {
+            musicUpdateListener.onChange(currentPosition);
+        }
+
     }
 
     public void pause() {

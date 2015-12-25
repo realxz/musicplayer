@@ -68,7 +68,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/ImageView1_favorite"
+                    android:id="@+id/imageView1_favorite"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginLeft="20dp"

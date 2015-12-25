@@ -20,6 +20,7 @@ import com.xiezhen.musicplayer.activity.MainActivity;
 import com.xiezhen.musicplayer.activity.PlayActivity;
 import com.xiezhen.musicplayer.adapter.MyMusicListAdapter;
 import com.xiezhen.musicplayer.entity.Mp3Info;
+import com.xiezhen.musicplayer.service.PlayService;
 import com.xiezhen.musicplayer.utils.MediaUtils;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
         iv_head.setOnClickListener(this);
         iv_play_pause.setOnClickListener(this);
         iv_next.setOnClickListener(this);
-        loadData();
+//        loadData();
         return view;
     }
 
@@ -90,8 +91,9 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     /*
             加载本地音乐列表
             * */
-    private void loadData() {
+    public void loadData() {
         mp3Infos = MediaUtils.getMp3Infos(getActivity());
+//        mp3Infos = mainActivity.playService.mp3Infos;
         adapter = new MyMusicListAdapter(getActivity(), mp3Infos);
         listView_my_music.setAdapter(adapter);
 
@@ -99,6 +101,10 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (mainActivity.playService.getChangePlayList() != PlayService.MY_MUSIC_LIST) {
+            mainActivity.playService.setMp3Infos(mp3Infos);
+            mainActivity.playService.setChangePlayList(PlayService.MY_MUSIC_LIST);
+        }
         mainActivity.playService.play(position);
     }
 
@@ -110,9 +116,9 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     //    回调播放状态下的ui设置
     public void changeUIStatusOnPlay(int position) {
         Log.d("xiezhen", "changeUistatusonplay");
-        if (position >= 0 && position < mp3Infos.size()) {
+        if (position >= 0 && position < mainActivity.playService.mp3Infos.size()) {
             Log.d("xiezhen", "" + position);
-            Mp3Info mp3Inf = mp3Infos.get(position);
+            Mp3Info mp3Inf = mainActivity.playService.mp3Infos.get(position);
             tv_songName.setText(mp3Inf.getTitle());
             tv_singer.setText(mp3Inf.getArtist());
 

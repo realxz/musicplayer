@@ -14,7 +14,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.exception.DbException;
 import com.xiezhen.musicplayer.R;
+import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.entity.Mp3Info;
 import com.xiezhen.musicplayer.service.PlayService;
 import com.xiezhen.musicplayer.utils.MediaUtils;
@@ -31,8 +34,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     private ImageView imageView1_album;
     private ImageView imageView3_previous;
     private ImageView imageView1_play_mode;
+    private ImageView imageView1_favorite;
     private SeekBar seekBar1;
-    private ArrayList<Mp3Info> mp3infos;
+    //    private ArrayList<Mp3Info> mp3infos;
     private static final int UPDATE_TIME = 0x1;
     private static MyHandler myHandler;
     //    private boolean isPause = false;
@@ -46,7 +50,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         initView();
         initViewPager();
         addListener();
-        mp3infos = MediaUtils.getMp3Infos(this);
+//        mp3infos = MediaUtils.getMp3Infos(this);
 //        bindPlayService();
 //        change(position);
         myHandler = new MyHandler(this);
@@ -83,6 +87,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         imageView1_play_mode = (ImageView) findViewById(R.id.imageView1_play_mode);
         seekBar1 = (SeekBar) findViewById(R.id.seekBar1);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        imageView1_favorite = (ImageView) findViewById(R.id.imageView1_favorite);
     }
 
     private void addListener() {
@@ -91,6 +96,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         imageView3_previous.setOnClickListener(this);
         imageView1_play_mode.setOnClickListener(this);
         seekBar1.setOnSeekBarChangeListener(this);
+        imageView1_favorite.setOnClickListener(this);
     }
 
     private void initViewPager() {
@@ -172,7 +178,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void change(int position) {
         Log.d("xiezhen", "PlayActivity");
-        Mp3Info mp3Info = mp3infos.get(position);
+        Mp3Info mp3Info = playService.mp3Infos.get(position);
         textView1_title.setText(mp3Info.getTitle());
         Bitmap albumBitmap = MediaUtils.getArtwork(this, mp3Info.getId(), mp3Info.getAlbumId(), true, false);
         imageView1_album.setImageBitmap(albumBitmap);
@@ -203,6 +209,33 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
                 break;
         }
 
+        try {
+            Mp3Info likeMp3Info = CrashAppliacation.dbUtils.findFirst(Selector.from(Mp3Info.class).where("mp3InfoId", "=", getId(mp3Info)));
+
+            if (null == likeMp3Info) {
+                imageView1_favorite.setImageResource(R.mipmap.xin_bai);
+            } else {
+                imageView1_favorite.setImageResource(R.mipmap.xin_hong);
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private long getId(Mp3Info mp3Info) {
+        long id = 0;
+        switch (playService.getChangePlayList()) {
+            case PlayService.MY_MUSIC_LIST:
+                id = mp3Info.getId();
+                break;
+            case PlayService.LIKE_MUSIC_LIST:
+                id = mp3Info.getMp3InfoId();
+                break;
+            default:
+                break;
+        }
+        return id;
     }
 
     @Override
@@ -253,6 +286,33 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
                         break;
                     default:
                         break;
+                }
+                break;
+            }
+            case R.id.imageView1_favorite: {
+                Mp3Info mp3Info = playService.mp3Infos.get(playService.getCurrentPosition());
+                try {
+                    Mp3Info likeMp3Info = CrashAppliacation.dbUtils.findFirst(Selector.from(Mp3Info.class).where("mp3InfoId", "=", getId(mp3Info)));
+
+                    if (null == likeMp3Info) {
+                        mp3Info.setMp3InfoId(mp3Info.getId());
+                        mp3Info.setIsLike(1);
+                        CrashAppliacation.dbUtils.save(mp3Info);
+                        imageView1_favorite.setImageResource(R.mipmap.xin_hong);
+                    } else {
+                        int isLikt = likeMp3Info.getIsLike();
+                        if (isLikt == 1) {
+                            likeMp3Info.setIsLike(0);
+                            imageView1_favorite.setImageResource(R.mipmap.xin_bai);
+                        } else {
+                            likeMp3Info.setIsLike(1);
+                            imageView1_favorite.setImageResource(R.mipmap.xin_hong);
+                        }
+                        CrashAppliacation.dbUtils.deleteById(Mp3Info.class, likeMp3Info.getId());
+
+                    }
+                } catch (DbException e) {
+                    e.printStackTrace();
                 }
                 break;
             }
