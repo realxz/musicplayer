@@ -1,6 +1,7 @@
 package com.xiezhen.musicplayer.application;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.lidroid.xutils.DbUtils;
@@ -14,6 +15,7 @@ public class CrashAppliacation extends Application {
     private static CrashAppliacation sInstance;
     public static SharedPreferences sp;
     public static DbUtils dbUtils;
+    public static Context context;
 
     @Override
     public void onCreate() {
@@ -22,6 +24,7 @@ public class CrashAppliacation extends Application {
         dbUtils = DbUtils.create(getApplicationContext(), Constant.DB_NAME);
         sInstance = this;
 
+        context=getApplicationContext();
         //在这里为应用设置异常处理程序，然后我们的程序才能捕获未处理的异常
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
