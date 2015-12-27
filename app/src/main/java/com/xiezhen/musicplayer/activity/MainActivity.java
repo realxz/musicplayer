@@ -46,6 +46,23 @@ public class MainActivity extends BaseActivity {
         tabs.setViewPager(pager);
         setTabsValue();
 //        bindPlayService();
+
+        //test
+        /*BmobQuery<Mp3Cloud> query = new BmobQuery<Mp3Cloud>();
+        query.findObjects(this, new FindListener<Mp3Cloud>() {
+            @Override
+            public void onSuccess(List<Mp3Cloud> list) {
+                Toast.makeText(MainActivity.this, "查询成功：共" + list.size() + "条数据", Toast.LENGTH_SHORT).show();
+                for (Mp3Cloud m : list) {
+                    Log.d("xiezhen", m.getMusicUrl()+"");
+                }
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                Toast.makeText(MainActivity.this, "查询失败" + s, Toast.LENGTH_SHORT).show();
+            }
+        });*/
     }
 
     @Override

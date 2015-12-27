@@ -6,6 +6,16 @@ package com.xiezhen.musicplayer.entity;
 public class Mp3Info {
     private long id;
     private long mp3InfoId;
+    private int isLike;
+    private long playTime;
+    private String title;
+    private String artist;
+    private String album;
+    private long albumId;
+    private long duration;
+    private long size;
+    private String url;
+    private int isMusic;
 
     public long getMp3InfoId() {
         return mp3InfoId;
@@ -14,9 +24,6 @@ public class Mp3Info {
     public void setMp3InfoId(long mp3InfoId) {
         this.mp3InfoId = mp3InfoId;
     }
-
-    private int isLike;//1 like 0default;
-    private long playTime;//最近播放的时间
 
     public int getIsLike() {
         return isLike;
@@ -33,15 +40,6 @@ public class Mp3Info {
     public void setPlayTime(long playTime) {
         this.playTime = playTime;
     }
-
-    private String title;
-    private String artist;
-    private String album;
-    private long albumId;
-    private long duration;
-    private long size;
-    private String url;
-    private int isMusic;
 
     public long getId() {
         return id;

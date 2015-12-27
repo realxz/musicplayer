@@ -2,6 +2,7 @@ package com.xiezhen.musicplayer.activity;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
@@ -18,11 +19,27 @@ import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
 import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.application.CrashAppliacation;
+import com.xiezhen.musicplayer.entity.Mp3Cloud;
 import com.xiezhen.musicplayer.entity.Mp3Info;
 import com.xiezhen.musicplayer.service.PlayService;
+import com.xiezhen.musicplayer.utils.Constant;
+import com.xiezhen.musicplayer.utils.DownloadUtils;
 import com.xiezhen.musicplayer.utils.MediaUtils;
+import com.xiezhen.musicplayer.utils.SearchMusicUtils;
+import com.xiezhen.musicplayer.view.DefaultLrcBuilder;
+import com.xiezhen.musicplayer.view.ILrcBuilder;
+import com.xiezhen.musicplayer.view.ILrcView;
+import com.xiezhen.musicplayer.view.LrcRow;
+import com.xiezhen.musicplayer.view.LrcView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -37,11 +54,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     private ImageView imageView1_favorite;
     private SeekBar seekBar1;
     //    private ArrayList<Mp3Info> mp3infos;
-    private static final int UPDATE_TIME = 0x1;
+    private static final int UPDATE_TIME = 11111;
+    private static final int UPDATE_LRC = 22222;
     private static MyHandler myHandler;
     //    private boolean isPause = false;
     private ViewPager viewPager;
     private List<View> data;
+    private LrcView lrcView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +124,22 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         imageView1_album = (ImageView) album_image_layout.findViewById(R.id.imageView1_album);
         textView1_title = (TextView) album_image_layout.findViewById(R.id.textView1_title);
         data.add(album_image_layout);
-        data.add(getLayoutInflater().inflate(R.layout.lrc_layout, null));
+
+        View lrc_layout = getLayoutInflater().inflate(R.layout.lrc_layout, null);
+        lrcView = (LrcView) lrc_layout.findViewById(R.id.lrcView);
+        lrcView.setListener(new ILrcView.LrcViewListener() {
+            @Override
+            public void onLrcSeeked(int newPosition, LrcRow row) {
+                if (playService.isPlaying()) {
+                    playService.seekTO((int) row.time);
+                }
+            }
+        });
+        lrcView.setLoadingTipText("正在加载歌词");
+        lrcView.setBackgroundResource(R.mipmap.jb_bg);
+        lrcView.getBackground().setAlpha(150);
+
+        data.add(lrc_layout);
         viewPager.setAdapter(new ViewPagerAdapter(data));
     }
 
@@ -145,6 +179,27 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
 
     }
 
+    private void loadLRC(File lrcFile) {
+        StringBuffer buf = new StringBuffer(1024 * 10);
+        char[] chars = new char[1024];
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(lrcFile)));
+            int len = -1;
+            while ((len = in.read(chars)) != -1) {
+                buf.append(chars, 0, len);
+            }
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ILrcBuilder builder = new DefaultLrcBuilder();
+        List<LrcRow> rows = builder.getLrcRows(buf.toString());
+        lrcView.setLrc(rows);
+
+    }
+
     static class MyHandler extends Handler {
         private PlayActivity playActivity;
 
@@ -160,6 +215,18 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
                 switch (msg.what) {
                     case UPDATE_TIME:
                         playActivity.textView1_start_time.setText(MediaUtils.formatTime(msg.arg1));
+                        break;
+                    case UPDATE_LRC:
+                        playActivity.lrcView.seekLrcToTime((int) msg.obj);
+                        break;
+                    case DownloadUtils.SUCCESS_LRC:
+                        playActivity.loadLRC(new File((String) msg.obj));
+                        break;
+                    case DownloadUtils.FAILED_LRC:
+                        Toast.makeText(playActivity, "歌词下载失败", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -173,6 +240,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         msg.arg1 = progress;
         myHandler.sendMessage(msg);
         seekBar1.setProgress(progress);
+        myHandler.obtainMessage(UPDATE_LRC, progress).sendToTarget();
     }
 
     @Override
@@ -224,6 +292,22 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
             }
         } catch (DbException e) {
             e.printStackTrace();
+        }
+        String songName = mp3Info.getTitle();
+        String lrcPath = Environment.getExternalStorageDirectory() + Constant.DIR_LRC + "/" + songName + ".lrc";
+        File lrcFile = new File(lrcPath);
+        if (!lrcFile.exists()) {
+            SearchMusicUtils.getsInstance(this).setListener(new SearchMusicUtils.OnSearchResultListener() {
+                @Override
+                public void onSearchResult(ArrayList<Mp3Cloud> results) {
+                    if (results != null && results.size() > 0) {
+                        Mp3Cloud searchResult = results.get(0);
+                        DownloadUtils.getsInstance(getApplicationContext()).downloadLRC(searchResult.getLrcUrl().getFileUrl(getApplicationContext()), searchResult.getMusicName(), myHandler);
+                    }
+                }
+            }).search(songName, 1);
+        } else {
+            loadLRC(lrcFile);
         }
 
     }
@@ -305,24 +389,31 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
                     Mp3Info likeMp3Info = CrashAppliacation.dbUtils.findFirst(Selector.from(Mp3Info.class).where("mp3InfoId", "=", getId(mp3Info)));
 
                     if (null == likeMp3Info) {
+                        Log.d("xiezhen","查询数据库没有这条消息");
                         mp3Info.setMp3InfoId(mp3Info.getId());
                         mp3Info.setIsLike(1);
+                        mp3Info.setPlayTime(0);
                         CrashAppliacation.dbUtils.save(mp3Info);
                         imageView1_favorite.setImageResource(R.mipmap.xin_hong);
                     } else {
+                        Log.d("xiezhen","查询数据库有这条消息");
                         int isLike = likeMp3Info.getIsLike();
                         if (isLike == 1) {
+                            Log.d("xiezhen","查询数据库有这条消息--喜欢");
                             likeMp3Info.setIsLike(0);
                             imageView1_favorite.setImageResource(R.mipmap.xin_bai);
                         } else {
                             likeMp3Info.setIsLike(1);
+                            Log.d("xiezhen", "查询数据库有这条消息，不喜欢");
                             imageView1_favorite.setImageResource(R.mipmap.xin_hong);
                         }
                         CrashAppliacation.dbUtils.update(likeMp3Info, "isLike");
 
                     }
                 } catch (DbException e) {
+                    Log.d("xiezhen","db error");
                     e.printStackTrace();
+                    Log.d("xiezhen",e.getMessage());
                 }
                 break;
             }

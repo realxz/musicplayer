@@ -16,5 +16,5 @@ public class Constant {
     public static final int FAILED = 2;
 
     public static final String DIR_MUSIC = "/codingke_music";
-    public static final String DIR_LRC = "codingke_music/lrc";
+    public static final String DIR_LRC = "/codingke_music/lrc";
 }

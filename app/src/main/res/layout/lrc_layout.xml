@@ -4,15 +4,9 @@
     android:layout_height="match_parent"
     android:background="#5c5b5b">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="145dp"
-        android:text="歌词"
-        android:textColor="@android:color/black"
-        android:textSize="@android:dimen/app_icon_size" />
+    <com.xiezhen.musicplayer.view.LrcView
+        android:id="@+id/lrcView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

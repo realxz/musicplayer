@@ -6,9 +6,11 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.xiezhen.musicplayer.activity.MainActivity;
+import com.xiezhen.musicplayer.entity.Mp3Cloud;
 import com.xiezhen.musicplayer.entity.SearchResult;
 import com.xiezhen.musicplayer.utils.DownloadUtils;
 
@@ -16,10 +18,10 @@ import com.xiezhen.musicplayer.utils.DownloadUtils;
  * Created by xiezhen on 2015/12/26 0026.
  */
 public class DownloadDialogFragment extends DialogFragment {
-    private SearchResult searchResult;
+    private Mp3Cloud searchResult;
     private MainActivity mainActivity;
 
-    public  static DownloadDialogFragment newInstance(SearchResult searchResult) {
+    public  static DownloadDialogFragment newInstance(Mp3Cloud searchResult) {
         DownloadDialogFragment downloadDialogFragment = new DownloadDialogFragment();
         downloadDialogFragment.searchResult = searchResult;
         return downloadDialogFragment;
@@ -56,7 +58,7 @@ public class DownloadDialogFragment extends DialogFragment {
 
     private void downloadMusic() {
         Toast.makeText(mainActivity, "正在下载: " + searchResult.getMusicName(), Toast.LENGTH_SHORT).show();
-        DownloadUtils.getsInstance().setListener(new DownloadUtils.OnDownloadListener() {
+        DownloadUtils.getsInstance(mainActivity).setListener(new DownloadUtils.OnDownloadListener() {
             @Override
             public void onDownload(String mp3Url) {
                 Toast.makeText(mainActivity, mp3Url, Toast.LENGTH_SHORT).show();

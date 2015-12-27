@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xiezhen.musicplayer" >
+    package="com.xiezhen.musicplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -12,11 +12,8 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -38,11 +35,11 @@
         android:icon="@mipmap/app_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.StartActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="ZhenMusic" >
+            android:label="ZhenMusic">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,10 +54,8 @@
             android:exported="true" />
 
         <activity android:name=".activity.PlayActivity" />
-        <activity android:name=".activity.FavoriteActivity" >
-        </activity>
-        <activity android:name=".activity.PlayRecordListActivity" >
-        </activity>
+        <activity android:name=".activity.FavoriteActivity"></activity>
+        <activity android:name=".activity.PlayRecordListActivity"></activity>
     </application>
 
 </manifest>

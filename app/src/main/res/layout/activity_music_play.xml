@@ -69,8 +69,8 @@
 
                 <ImageView
                     android:id="@+id/imageView1_favorite"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="100dp"
                     android:src="@mipmap/xin_bai" />

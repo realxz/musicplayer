@@ -89,5 +89,5 @@
         android:listSelector="@android:color/transparent"
         android:overScrollMode="never"
         android:scrollbars="none"
-        android:visibility="gone" />
+        android:visibility="visible" />
 </LinearLayout>

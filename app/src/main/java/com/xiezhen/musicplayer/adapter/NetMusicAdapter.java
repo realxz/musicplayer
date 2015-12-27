@@ -8,27 +8,29 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.xiezhen.musicplayer.R;
+import com.xiezhen.musicplayer.entity.Mp3Cloud;
 import com.xiezhen.musicplayer.entity.SearchResult;
 
 import java.util.ArrayList;
 
 /**
- * Created by Administrator on 2015/12/25 0025.
+ * Created by xiezhen on 2015/12/25 0025.
  */
 public class NetMusicAdapter extends BaseAdapter {
     private Context ctx;
-    private ArrayList<SearchResult> searchResults;
+    //    private ArrayList<SearchResult> searchResults;
+    private ArrayList<Mp3Cloud> searchResults;
 
-    public  NetMusicAdapter(Context ctx, ArrayList<SearchResult> searchResults) {
+    public NetMusicAdapter(Context ctx, ArrayList<Mp3Cloud> searchResults) {
         this.ctx = ctx;
         this.searchResults = searchResults;
     }
 
-    public ArrayList<SearchResult> getSearchResults() {
+    public ArrayList<Mp3Cloud> getSearchResults() {
         return searchResults;
     }
 
-    public void setSearchResults(ArrayList<SearchResult> searchResults) {
+    public void setSearchResults(ArrayList<Mp3Cloud> searchResults) {
         this.searchResults = searchResults;
     }
 
@@ -59,7 +61,7 @@ public class NetMusicAdapter extends BaseAdapter {
             convertView.setTag(vh);
         }
         vh = (ViewHolder) convertView.getTag();
-        SearchResult result = searchResults.get(position);
+        Mp3Cloud result = searchResults.get(position);
         vh.textView1_title.setText(result.getMusicName());
         vh.textView2_singer.setText(result.getArtist());
         return convertView;

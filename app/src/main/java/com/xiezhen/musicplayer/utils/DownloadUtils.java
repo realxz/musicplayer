@@ -1,5 +1,6 @@
 package com.xiezhen.musicplayer.utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.xiezhen.musicplayer.entity.Mp3Cloud;
 import com.xiezhen.musicplayer.entity.SearchResult;
 
 import org.jsoup.Jsoup;
@@ -16,10 +18,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.listener.GetListener;
 
 /**
  * Created by xiezhen on 2015/12/26 0026.
@@ -38,12 +47,15 @@ public class DownloadUtils {
     private OnDownloadListener mListener;
     private ExecutorService mThreadPool;
 
+    public static Context context;
+
     public DownloadUtils setListener(OnDownloadListener mListener) {
         this.mListener = mListener;
         return this;
     }
 
-    public synchronized static DownloadUtils getsInstance() {
+    public synchronized static DownloadUtils getsInstance(Context context) {
+        DownloadUtils.context = context;
         if (sInstance == null) {
             sInstance = new DownloadUtils();
         }
@@ -54,7 +66,7 @@ public class DownloadUtils {
         mThreadPool = Executors.newSingleThreadExecutor();
     }
 
-    public void download(final SearchResult searchResult) {
+    public void download(final Mp3Cloud searchResult) {
         final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -67,7 +79,7 @@ public class DownloadUtils {
                         break;
                     case GET_MP3_URL:
                         Log.d("xiezhen", "d");
-                        downloadMusic(searchResult, (String) msg.obj, this);
+                        downloadMusic(searchResult, (BmobFile) msg.obj, this);
                         break;
                     case GET_FAILED_MP3_URL:
                         if (mListener != null) mListener.onFailed("下载失败，该歌曲为收费或VIP类型");
@@ -75,8 +87,10 @@ public class DownloadUtils {
                     case SUCCESS_MP3:
                         if (mListener != null)
                             mListener.onDownload(searchResult.getMusicName() + "已下载");
-                        String url = Constant.BAIDU_URL + searchResult.getUrl();
-                        downloadLRC(url, searchResult.getMusicName(), this);
+//                        String url = Constant.BAIDU_URL + searchResult.getUrl();
+                        Log.d("xiezhen", "lrc=" + searchResult.getLrcUrl().getFileUrl(context));
+                        Log.d("xiezhen", "lrc=" + searchResult.getLrcUrl().getFilename());
+                        downloadLRC(searchResult.getLrcUrl().getFileUrl(context), searchResult.getMusicName(), this);
                         break;
                     case FAILED_MP3:
                         if (mListener != null)
@@ -92,8 +106,23 @@ public class DownloadUtils {
     }
 
 
-    private void getDownloadMusicURL(final SearchResult searchResult, final Handler handler) {
-        mThreadPool.execute(new Runnable() {
+    private void getDownloadMusicURL(final Mp3Cloud searchResult, final Handler handler) {
+        handler.obtainMessage(GET_MP3_URL, searchResult.getMusicUrl()).sendToTarget();
+       /* BmobQuery<BmobFile> query = new BmobQuery<BmobFile>();
+        query.getObject(context, searchResult.getObjectId(), new GetListener<BmobFile>() {
+            @Override
+            public void onSuccess(BmobFile mp3Cloud) {
+                Message msg = handler.obtainMessage(GET_MP3_URL, mp3Cloud);
+                Log.d("xiezhen", "mp3cloud=" + mp3Cloud.getFileUrl(context));
+                msg.sendToTarget();
+            }
+
+            @Override
+            public void onFailure(int i, String s) {
+                handler.obtainMessage(GET_FAILED_MP3_URL).sendToTarget();
+            }
+        });*/
+       /* mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 String url = Constant.BAIDU_URL + "/song/" + searchResult.getUrl().substring(searchResult.getUrl().lastIndexOf("/") + 1) + DOWNLOAD_URL;
@@ -133,10 +162,14 @@ public class DownloadUtils {
                     Log.d("xiezhen", "c");
                 }
             }
-        });
+        });*/
     }
 
-    private void downloadMusic(final SearchResult searchResult, final String url, final Handler handler) {
+    /**
+     * searchResult 下载的歌曲对象
+     * url  下载的歌曲对象中的MP3
+     */
+    private void downloadMusic(final Mp3Cloud searchResult, final BmobFile url, final Handler handler) {
         mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
@@ -146,7 +179,7 @@ public class DownloadUtils {
 
                     musicDirFile.mkdirs();
                 }
-                String mp3url = Constant.BAIDU_URL + url;
+//                String mp3url = Constant.BAIDU_URL + url;
                 String target = musicDirFile + "/" + searchResult.getMusicName() + ".mp3";
                 File fileTarget = new File(target);
                 if (fileTarget.exists()) {
@@ -154,7 +187,7 @@ public class DownloadUtils {
                     return;
                 } else {
                     OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().url(mp3url).build();
+                    Request request = new Request.Builder().url(url.getFileUrl(context)).build();
                     try {
                         Response response = client.newCall(request).execute();
                         if (response.isSuccessful()) {
@@ -173,23 +206,24 @@ public class DownloadUtils {
         });
     }
 
-    private void downloadLRC(final String url, final String musicName, final Handler handler) {
+    public  void downloadLRC(final String url, final String musicName, final Handler handler) {
         mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Document doc = Jsoup.connect(url).userAgent(Constant.USER_AGENT).timeout(6000).get();
-                    Elements lrcTag = doc.select("div.lyric-content");
-                    String lrcURL = lrcTag.attr("data-lrclink");
+//                    Document doc = Jsoup.connect(url).userAgent(Constant.USER_AGENT).timeout(6000).get();
+//                    Elements lrcTag = doc.select("div.lyric-content");
+//                    String lrcURL = lrcTag.attr("data-lrclink");
 
                     File lrcDirFile = new File(Environment.getExternalStorageDirectory() + Constant.DIR_LRC);
                     if (!lrcDirFile.exists()) {
                         lrcDirFile.mkdirs();
+                        Log.d("xiezhen", "alalal");
                     }
-                    lrcURL = Constant.BAIDU_URL + lrcURL;
+//                    lrcURL = Constant.BAIDU_URL + lrcURL;
                     String target = lrcDirFile + "/" + musicName + ".lrc";
                     OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().url(lrcURL).build();
+                    Request request = new Request.Builder().url(url).build();
                     try {
                         Response response = client.newCall(request).execute();
                         if (response.isSuccessful()) {
@@ -203,7 +237,7 @@ public class DownloadUtils {
                         e.printStackTrace();
                         handler.obtainMessage(FAILED_LRC).sendToTarget();
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

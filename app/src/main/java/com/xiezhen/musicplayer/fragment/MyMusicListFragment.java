@@ -96,6 +96,9 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             * */
     public void loadData() {
         mp3Infos = MediaUtils.getMp3Infos(getActivity());
+        for(Mp3Info m:mp3Infos){
+            Log.d("xiezhen","my name="+m.getTitle());
+        }
 //        mp3Infos = mainActivity.playService.mp3Infos;
         adapter = new MyMusicListAdapter(getActivity(), mp3Infos);
         listView_my_music.setAdapter(adapter);
@@ -127,6 +130,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
                 CrashAppliacation.dbUtils.update(playRecordMp3Info, "playTime");
             }
         } catch (DbException e) {
+            Log.d("xiezhen","father="+e.getMessage());
             e.printStackTrace();
         }
     }

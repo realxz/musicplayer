@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.activity.MainActivity;
 import com.xiezhen.musicplayer.adapter.NetMusicAdapter;
+import com.xiezhen.musicplayer.entity.Mp3Cloud;
 import com.xiezhen.musicplayer.entity.SearchResult;
 import com.xiezhen.musicplayer.utils.AppUtils;
 import com.xiezhen.musicplayer.utils.Constant;
@@ -30,6 +31,10 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by xiezhen on 2015/12/16 0016.
@@ -43,7 +48,8 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
     private LinearLayout ll_search_container;
     private ImageButton ib_search_btn;
     private EditText et_search_content;
-    private ArrayList<SearchResult> searchResults = new ArrayList<SearchResult>();
+    //    private ArrayList<SearchResult> searchResults = new ArrayList<SearchResult>();
+    private ArrayList<Mp3Cloud> searchResults = new ArrayList<Mp3Cloud>();
     private NetMusicAdapter netMusicAdapter;
     private int page = 1;//搜索音乐的页码
 
@@ -71,6 +77,7 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
         et_search_content = (EditText) view.findViewById(R.id.et_search_content);
 
         listView_net_music.setOnItemClickListener(this);
+        listView_net_music.setVisibility(View.VISIBLE);
         ll_search_btn_container.setOnClickListener(this);
         ib_search_btn.setOnClickListener(this);
         loadNetData();//加载网络歌曲数据
@@ -107,10 +114,10 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
             return;
         }
         load_layout.setVisibility(View.VISIBLE);
-        SearchMusicUtils.getsInstance().setListener(new SearchMusicUtils.OnSearchResultListener() {
+        SearchMusicUtils.getsInstance(mainActivity).setListener(new SearchMusicUtils.OnSearchResultListener() {
             @Override
-            public void onSearchResult(ArrayList<SearchResult> results) {
-                ArrayList<SearchResult> sr = netMusicAdapter.getSearchResults();
+            public void onSearchResult(ArrayList<Mp3Cloud> results) {
+                ArrayList<Mp3Cloud> sr = netMusicAdapter.getSearchResults();
                 sr.clear();
                 sr.addAll(results);
                 netMusicAdapter.notifyDataSetChanged();
@@ -123,7 +130,6 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position >= netMusicAdapter.getSearchResults().size() || position < 0) return;
-        ;
         showDownloadDialog(position);
     }
 
@@ -144,7 +150,20 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
         @Override
         protected Integer doInBackground(String... params) {
             String url = params[0];
-            try {
+            BmobQuery<Mp3Cloud> query = new BmobQuery<Mp3Cloud>();
+            query.findObjects(mainActivity, new FindListener<Mp3Cloud>() {
+                @Override
+                public void onSuccess(List<Mp3Cloud> list) {
+                    for (Mp3Cloud m : list) {
+                        searchResults.add(m);
+                    }
+                }
+
+                @Override
+                public void onError(int i, String s) {
+                }
+            });
+            /*try {
                 //使用jsoup组件请求网络并解析音乐数据
                 Document doc = Jsoup.connect(url).userAgent(Constant.USER_AGENT).
                         timeout(6 * 1000).get();
@@ -162,10 +181,11 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
                     searchResult.setAlbum("热歌榜");
                     searchResults.add(searchResult);
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
                 return -1;
-            }
+            }*/
             return 1;
         }
 
