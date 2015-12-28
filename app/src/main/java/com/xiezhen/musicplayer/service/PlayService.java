@@ -128,6 +128,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         if (es != null && es.isShutdown() == false) {
             es.shutdown();
         }
+        mPlayer = null;
+        mp3Infos = null;
+        musicUpdateListener = null;
         Log.d("xiezhen", "onDestroy");
     }
 

@@ -13,10 +13,12 @@ import com.xiezhen.musicplayer.utils.MediaUtils;
 
 import java.util.ArrayList;
 
+import quickscroll.Scrollable;
+
 /**
  * Created by xiezhen on 2015/12/16 0016.
  */
-public class MyMusicListAdapter extends BaseAdapter {
+public class MyMusicListAdapter extends BaseAdapter implements Scrollable {
     private Context context;
     private ArrayList<Mp3Info> mp3Infos;
 
@@ -63,6 +65,16 @@ public class MyMusicListAdapter extends BaseAdapter {
         viewHolder.tv_time.setText(MediaUtils.formatTime(mp3Info.getDuration()));
         viewHolder.tv_singer.setText(mp3Info.getArtist());
         return convertView;
+    }
+
+    @Override
+    public String getIndicatorForPosition(int childposition, int groupposition) {
+        return Character.toString(mp3Infos.get(childposition).getTitle().charAt(0));
+    }
+
+    @Override
+    public int getScrollPosition(int childposition, int groupposition) {
+        return childposition;
     }
 
     private static class ViewHolder {

@@ -9,4 +9,8 @@
         android:id="@+id/near_play"
         android:orderInCategory="2"
         android:title="nearplay" />
+    <item
+        android:id="@+id/exit"
+        android:orderInCategory="3"
+        android:title="exit" />
 </menu>

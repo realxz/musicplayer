@@ -3,10 +3,12 @@ package com.xiezhen.musicplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,8 @@ import com.xiezhen.musicplayer.utils.MediaUtils;
 
 import java.util.ArrayList;
 
+import quickscroll.QuickScroll;
+
 /**
  * Created by xiezhen on 2015/12/16 0009.
  */
@@ -45,6 +49,8 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     private ImageView iv_next;
 
     private int position = 0;
+
+    private QuickScroll quickscroll;
 
     public static MyMusicListFragment newInstance() {
         MyMusicListFragment my = new MyMusicListFragment();
@@ -70,6 +76,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
         tv_songName = (TextView) view.findViewById(R.id.textView_songName);
         tv_singer = (TextView) view.findViewById(R.id.textView_singer);
 
+        quickscroll = (QuickScroll) view.findViewById(R.id.quickscroll);
         listView_my_music.setOnItemClickListener(this);
         iv_head.setOnClickListener(this);
         iv_play_pause.setOnClickListener(this);
@@ -96,13 +103,21 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
             * */
     public void loadData() {
         mp3Infos = MediaUtils.getMp3Infos(getActivity());
-        for(Mp3Info m:mp3Infos){
-            Log.d("xiezhen","my name="+m.getTitle());
+        for (Mp3Info m : mp3Infos) {
+            Log.d("xiezhen", "my name=" + m.getTitle());
         }
 //        mp3Infos = mainActivity.playService.mp3Infos;
         adapter = new MyMusicListAdapter(getActivity(), mp3Infos);
         listView_my_music.setAdapter(adapter);
+        initQuickscroll();
 
+    }
+
+    private void initQuickscroll() {
+        quickscroll.init(quickscroll.TYPE_POPUP_WITH_HANDLE, listView_my_music, adapter, QuickScroll.STYLE_HOLO);
+        quickscroll.setFixedSize(1);
+        quickscroll.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 48);
+        quickscroll.setPopupColor(QuickScroll.BLUE_LIGHT, quickscroll.BLUE_LIGHT_SEMITRANSPARENT, 1, Color.WHITE, 1);
     }
 
     @Override
@@ -130,7 +145,7 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
                 CrashAppliacation.dbUtils.update(playRecordMp3Info, "playTime");
             }
         } catch (DbException e) {
-            Log.d("xiezhen","father="+e.getMessage());
+            Log.d("xiezhen", "father=" + e.getMessage());
             e.printStackTrace();
         }
     }

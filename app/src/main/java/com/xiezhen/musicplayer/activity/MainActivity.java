@@ -18,6 +18,7 @@ import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.fragment.MyMusicListFragment;
 import com.xiezhen.musicplayer.fragment.NetMusicListFragment;
+import com.xiezhen.musicplayer.service.PlayService;
 
 public class MainActivity extends BaseActivity {
 
@@ -81,6 +82,10 @@ public class MainActivity extends BaseActivity {
             case R.id.near_play:
                 Intent intent1 = new Intent(this, PlayRecordListActivity.class);
                 startActivity(intent1);
+                break;
+            case R.id.exit:
+                stopService(new Intent(this, PlayService.class));
+                finish();
                 break;
         }
         return true;
