@@ -13,12 +13,13 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.astuetz.PagerSlidingTabStrip;
+
 import com.xiezhen.musicplayer.R;
 import com.xiezhen.musicplayer.application.CrashAppliacation;
 import com.xiezhen.musicplayer.fragment.MyMusicListFragment;
 import com.xiezhen.musicplayer.fragment.NetMusicListFragment;
 import com.xiezhen.musicplayer.service.PlayService;
+import com.xiezhen.musicplayer.view.PagerSlidingTabStrip;
 
 public class MainActivity extends BaseActivity {
 
@@ -107,10 +108,9 @@ public class MainActivity extends BaseActivity {
                 TypedValue.COMPLEX_UNIT_SP, 16, dm));
         // 设置Tab Indicator的颜色
         tabs.setIndicatorColor(Color.parseColor("#45c01a"));
-        // 设置选中Tab文字的颜色 (这是我自定义的一个方法)
-//        tabs.setSelectedTextColor(Color.parseColor("#45c01a"));
         // 取消点击Tab时的背景色
         tabs.setTabBackground(0);
+        tabs.setSelectedTextColor(Color.parseColor("#45c01a"));
     }
 
     @Override
@@ -132,7 +132,9 @@ public class MainActivity extends BaseActivity {
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {getString(R.string.tab_name1), getString(R.string.tab_name2)};
+        final int PAGE_COUNT = 2;
+
+        private final String[] TITLES = {"我的音乐", "网络音乐"};
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -145,7 +147,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            return TITLES.length;
+            return PAGE_COUNT;
         }
 
         @Override
