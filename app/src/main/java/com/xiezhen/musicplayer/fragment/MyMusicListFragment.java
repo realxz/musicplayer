@@ -88,25 +88,23 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onResume() {
         super.onResume();
-//        mainActivity.unbindPlayService();
+        //绑定服务
         mainActivity.bindPlayService();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        //解除绑定
         mainActivity.unbindPlayService();
     }
 
-    /*
-            加载本地音乐列表
-            * */
+
     public void loadData() {
         mp3Infos = MediaUtils.getMp3Infos(getActivity());
         for (Mp3Info m : mp3Infos) {
             Log.d("xiezhen", "my name=" + m.getTitle());
         }
-//        mp3Infos = mainActivity.playService.mp3Infos;
         adapter = new MyMusicListAdapter(getActivity(), mp3Infos);
         listView_my_music.setAdapter(adapter);
         initQuickscroll();
@@ -199,6 +197,10 @@ public class MyMusicListFragment extends Fragment implements AdapterView.OnItemC
                 break;
             }
             case R.id.imageView_head: {
+                if(0==mainActivity.playService.mp3Infos.size()){
+                   break;
+                }
+                Log.d("xiezhen",""+mainActivity.playService.mp3Infos.size());
                 Intent intent = new Intent(mainActivity, PlayActivity.class);
                 startActivity(intent);
                 break;

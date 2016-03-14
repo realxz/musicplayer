@@ -34,6 +34,7 @@
                 android:textColor="@android:color/darker_gray" />
 
             <SeekBar
+                style="@style/Widget.AppCompat.SeekBar"
                 android:id="@+id/seekBar1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

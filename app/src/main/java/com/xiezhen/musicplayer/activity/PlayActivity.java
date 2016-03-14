@@ -239,6 +239,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         Message msg = myHandler.obtainMessage(UPDATE_TIME);
         msg.arg1 = progress;
         myHandler.sendMessage(msg);
+        Log.d("xiezhen",""+progress);
         seekBar1.setProgress(progress);
         myHandler.obtainMessage(UPDATE_LRC, progress).sendToTarget();
     }
@@ -246,6 +247,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void change(int position) {
         Log.d("xiezhen", "PlayActivity");
+
         Mp3Info mp3Info = playService.mp3Infos.get(position);
         textView1_title.setText(mp3Info.getTitle());
         Bitmap albumBitmap = MediaUtils.getArtwork(this, mp3Info.getId(), mp3Info.getAlbumId(), true, false);

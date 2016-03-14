@@ -110,7 +110,6 @@ public class MediaUtils {
      * @return
      */
     public static ArrayList<Mp3Info> getMp3Infos(Context context) {
-//		System.out.println(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                 MediaStore.Audio.Media.DURATION + ">=180000", null,

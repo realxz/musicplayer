@@ -163,29 +163,7 @@ public class NetMusicListFragment extends Fragment implements AdapterView.OnItem
                 public void onError(int i, String s) {
                 }
             });
-            /*try {
-                //使用jsoup组件请求网络并解析音乐数据
-                Document doc = Jsoup.connect(url).userAgent(Constant.USER_AGENT).
-                        timeout(6 * 1000).get();
-                Elements songTitles = doc.select("span.song-title");
-                Elements artists = doc.select("span.author_list");
-                for (int i = 0; i < songTitles.size(); i++) {
-                    SearchResult searchResult = new SearchResult();
-                    Elements urls = songTitles.get(i).getElementsByTag("a");
-                    searchResult.setUrl(urls.get(0).attr("href"));
-                    searchResult.setMusicName(urls.get(0).text());
-                    //
-                    Elements artistElements = artists.get(i).getElementsByTag("a");
-                    searchResult.setArtist(artistElements.get(0).text());
 
-                    searchResult.setAlbum("热歌榜");
-                    searchResults.add(searchResult);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return -1;
-            }*/
             return 1;
         }
 

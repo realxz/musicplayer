@@ -1,6 +1,8 @@
 package com.xiezhen.musicplayer.utils;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -90,6 +92,9 @@ public class DownloadUtils {
 //                        String url = Constant.BAIDU_URL + searchResult.getUrl();
                         Log.d("xiezhen", "lrc=" + searchResult.getLrcUrl().getFileUrl(context));
                         Log.d("xiezhen", "lrc=" + searchResult.getLrcUrl().getFilename());
+                        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        scanIntent.setData(Uri.fromFile(new File(searchResult.getMusicName())));
+                        context.sendBroadcast(scanIntent);
                         downloadLRC(searchResult.getLrcUrl().getFileUrl(context), searchResult.getMusicName(), this);
                         break;
                     case FAILED_MP3:
